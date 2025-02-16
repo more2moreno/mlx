@@ -707,10 +707,15 @@ device_info() {
     if (rsrc_limit == 0) {
       rsrc_limit = 499000;
     }
+    size_t wired_limit_mb = 0;
+    sysctlbyname("iogpu.wired_limit_mb", &wired_limit_mb, &length, NULL, 0);
+
+    size_t maxBufferSize = 0;
+    maxBufferSize = std::max(raw_device->maxBufferLength(), wired_limit_mb << 20);
 
     return {
         {"architecture", arch},
-        {"max_buffer_length", raw_device->maxBufferLength()},
+        {"max_buffer_length", maxBufferSize},
         {"max_recommended_working_set_size",
          raw_device->recommendedMaxWorkingSetSize()},
         {"memory_size", memsize},
